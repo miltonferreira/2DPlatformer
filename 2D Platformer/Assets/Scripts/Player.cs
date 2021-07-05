@@ -139,7 +139,7 @@ public class Player : MonoBehaviour
 
         } else {
 
-            if(coyoteJump){ // pulo da fé
+            if(coyoteJump && availableJumps>0){         // pulo da fé
                 multipleJump = true;                    // permite pular + que 1 vez
                 availableJumps--;                       // subtrai 1 pulo
                 rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
