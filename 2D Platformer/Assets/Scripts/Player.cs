@@ -111,6 +111,8 @@ public class Player : MonoBehaviour
             if(!wasGrounded){
                 availableJumps = totalJumps;    // se tiver no chão pode pulo extra
                 multipleJump = false;           // se não tiver no chão, não dá pulo duplo
+
+                AudioManager.instance.PlaySFX("landing");
             }
         } else {
             if(wasGrounded)

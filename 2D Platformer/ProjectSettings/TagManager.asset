@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ramp
+  - BossAttack
   layers:
   - Default
   - TransparentFX
@@ -13,11 +14,11 @@ TagManager:
   - Water
   - UI
   - 
-  - 
+  - Player
   - Ground
   - Wall
   - Item
-  - 
+  - Enemy
   - 
   - 
   - 
