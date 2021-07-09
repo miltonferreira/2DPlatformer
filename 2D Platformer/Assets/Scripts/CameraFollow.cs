@@ -5,10 +5,10 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset;      // util para seta valor de z em -10
+    public Vector3 offset;                  // util para seta valor de z em -10
 
     [Range(2, 10)]
-    public float smoothFactor;
+    public float smoothFactor;              // velocidade de movimento da cam
     public Vector3 minValues, maxValue;
 
     private void FixedUpdate() 

@@ -30,10 +30,12 @@ public class Player : MonoBehaviour
     // crouch -------------------------------------------------
     [Header("Crouch")]
     [SerializeField]bool crouchPressed;
-    [SerializeField]Collider2D standingCollider;            // pega colisor padrão do player
+    [SerializeField]Collider2D standingCollider, crouchingCollider;            // pega colisor padrão do player
     float crouchSpeedModifier = 0.5f;                       // velocidade quando tiver gachado
     [SerializeField]Transform overHeadCheckCollider;        // posição para checar se tem chão na cabeça do player
     const float overHeadCheckRadius = 0.2f;                   // tamanho do circulo na cabeça do player
+
+    public bool isDead = false;
 
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
@@ -49,7 +51,7 @@ public class Player : MonoBehaviour
 
     void Update(){
 
-        if(!CanMove())
+        if(!CanMoveOrInteract())
             return;
         
         horizontalValue = Input.GetAxisRaw("Horizontal");
@@ -88,13 +90,16 @@ public class Player : MonoBehaviour
     }
 
     // verifica se pode se mover ou nao
-    bool CanMove(){
+    bool CanMoveOrInteract(){
         bool can = true;
 
         if(FindObjectOfType<InteractionSystem>().isExamining){
             can = false;
         }
         if(FindObjectOfType<InventorySystem>().isOpen){
+            can = false;
+        }
+        if(isDead){
             can = false;
         }
 
@@ -170,7 +175,8 @@ public class Player : MonoBehaviour
         animator.SetBool("Crouch", crouchFlag);
 
         // se gacha desativa colisor padrão
-        standingCollider.enabled = !crouchFlag;
+        standingCollider.enabled = !crouchFlag;     // quando gacha desativa collider grande
+        crouchingCollider.enabled = crouchFlag;     // quando gacha desativa collider pequeno
         #endregion
 
         #region Move & Run
@@ -209,6 +215,16 @@ public class Player : MonoBehaviour
         Gizmos.DrawSphere(groundCheckCollider.position, groundCheckRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(overHeadCheckCollider.position, overHeadCheckRadius);
+    }
+
+    public void Die(){
+        isDead = true;
+        FindObjectOfType<LevelManager>().Restart();
+    }
+
+    public void ResetPlayer(){
+        //horizontalValue = 0;    // zera movimento pros lados
+        isDead = false;
     }
 
     /*

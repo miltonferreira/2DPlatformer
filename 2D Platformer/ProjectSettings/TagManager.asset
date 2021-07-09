@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ramp
   - BossAttack
+  - Opossum
   layers:
   - Default
   - TransparentFX
