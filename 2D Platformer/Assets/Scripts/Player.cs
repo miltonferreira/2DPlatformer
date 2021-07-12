@@ -37,6 +37,16 @@ public class Player : MonoBehaviour
 
     public bool isDead = false;
 
+    // wall slide & jump --------------------------------------
+    [Header("Slide&Jump")]
+    [SerializeField]Transform wallCheckCollider;
+    [SerializeField]LayerMask wallLayer;
+    const float wallCheckRadius = 0.2f;
+    public float slideFactor = 0.2f;
+    bool isSliding;
+
+    float varHor;
+
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
     // public PhysicsMaterial2D ph;
@@ -79,7 +89,9 @@ public class Player : MonoBehaviour
 
         // set yVelocity do animator do player
         // pega velocidade y do rigidbody
-        animator.SetFloat("yVelocity", rb.velocity.y); 
+        animator.SetFloat("yVelocity", rb.velocity.y);
+
+        WallCheck();    // slide or jump wall
 
     }
 
@@ -150,13 +162,49 @@ public class Player : MonoBehaviour
                 multipleJump = true;                    // permite pular + que 1 vez
                 availableJumps--;                       // subtrai 1 pulo
                 rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
-                Debug.Log("Pulo Fé");
+                //Debug.Log("Pulo Fé");
 
             } else if(multipleJump && availableJumps>0){    // + pulos enquanto tiver availableJumps
                 availableJumps--;                       // subtrai 1 pulo
                 rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
             }
         }
+
+    }
+
+    void WallCheck(){
+        // if(Physics2D.OverlapCircle(wallCheckCollider.position, wallCheckRadius, wallLayer)
+        // && Mathf.Abs(horizontalValue)>0 && rb.velocity.y<0 && !isGrounded){
+
+        if(Physics2D.OverlapCircle(wallCheckCollider.position, wallCheckRadius, wallLayer)
+        && rb.velocity.y<0 && !isGrounded){
+
+            // if(!isSliding){
+            //     varHor = horizontalValue;
+            // }
+
+            if(!isSliding){
+                availableJumps = totalJumps;
+                multipleJump = false;
+            }
+                
+            Vector2 v = rb.velocity;
+            v.y = -slideFactor;
+            rb.velocity = v;
+            isSliding = true;
+
+            if(Input.GetButtonDown("Jump")){
+                availableJumps--;                       // subtrai 1 pulo
+                rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
+            }
+
+            // Debug.Log(rb.velocity.y);
+
+        } else {
+            isSliding = false;
+        }
+
+        animator.SetBool("Slide", isSliding);
     }
 
     void Move(float dir, bool crouchFlag){

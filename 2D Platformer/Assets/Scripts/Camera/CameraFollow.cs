@@ -22,9 +22,9 @@ public class CameraFollow : MonoBehaviour
 
         // definir minimo x,y,z e maximo x,y,z do movimento da cam
         Vector3 boundPosition = new Vector3(
-            Mathf.Clamp(target.position.x, minValues.x, maxValue.x),
-            Mathf.Clamp(target.position.y, minValues.y, maxValue.y),
-            Mathf.Clamp(target.position.z, minValues.z, maxValue.z)
+            Mathf.Clamp(targetPosition.x, minValues.x, maxValue.x),
+            Mathf.Clamp(targetPosition.y, minValues.y, maxValue.y),
+            Mathf.Clamp(targetPosition.z, minValues.z, maxValue.z)
         );
 
         // cria uma interpolação entre a posição da cam e do player/boundPosition
