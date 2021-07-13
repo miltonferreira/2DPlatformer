@@ -8,12 +8,14 @@ using UnityEngine.Events;
 public class Item : MonoBehaviour
 {
 
-    public enum InteractionType { NONE, PickUp, Examine}
+    public enum InteractionType { NONE, PickUp, Examine, GrabDrop}
 
     [Header("Tipo do Item")]
     public InteractionType interactType;
     public enum ItemType { Static, Consumables}
     public ItemType type;
+
+    public bool stackable = false;
 
     [Header("Examine")]
     public string descriptionText;
@@ -30,6 +32,9 @@ public class Item : MonoBehaviour
     public void Interact(){
         switch(interactType){
             case InteractionType.PickUp:
+                // Se não pode pegar item, não executa o resto do codigo
+                if(!FindObjectOfType<InventorySystem>().CanPickUp())
+                    return;
                 // add item na lista de itens coletados
                 FindObjectOfType<InventorySystem>().PickUp(gameObject);
                 gameObject.SetActive(false);
@@ -39,8 +44,11 @@ public class Item : MonoBehaviour
                 FindObjectOfType<InteractionSystem>().ExamineItem(this);
                 Debug.Log("Examine");
                 break;
+            case InteractionType.GrabDrop:
+                FindObjectOfType<InteractionSystem>().GrabDrop();
+                break;
             default:
-                
+                Debug.Log("Null Item");
                 break;
         }
 

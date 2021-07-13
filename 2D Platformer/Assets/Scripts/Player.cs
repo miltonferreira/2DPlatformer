@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -45,7 +46,10 @@ public class Player : MonoBehaviour
     public float slideFactor = 0.2f;
     bool isSliding;
 
-    float varHor;
+    float varHor;       //????
+
+    // HasLanded event -----------------------------------------
+    public static event Action HasLanded;
 
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
@@ -130,8 +134,22 @@ public class Player : MonoBehaviour
                 multipleJump = false;           // se não tiver no chão, não dá pulo duplo
 
                 AudioManager.instance.PlaySFX("landing");
+
+                // trigger the HasLanded event
+                HasLanded?.Invoke();    // ? indica que pode invocar ou não
+            }
+
+            // checa se tem plataforma que move embaixo do player
+            // se colidor com plataforma movel, player vira parente dele
+            foreach(var c in colliders){
+                if(c.tag == "MovingPlatform")
+                transform.parent = c.transform;
             }
         } else {
+
+            // se player não tiver tocando na plataforma movel, não é mais parente dele
+            transform.parent = null;
+
             if(wasGrounded)
                 StartCoroutine(CoyoteJumpDelay());
         }

@@ -3,7 +3,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-public class MarioCameraFollow : MonoBehaviour
+public class DynamicCameraFollow : MonoBehaviour
 {   
     [Header("Moving Cam Left")]
     public bool isMovingCamLeft;
@@ -24,9 +24,32 @@ public class MarioCameraFollow : MonoBehaviour
     [HideInInspector]
     public SetupState ss = SetupState.None;
 
+    // HasLanded event -----------------------------------------
+    public bool followFloor;
+    float goalAltitude;
     private void Start() {
         Follow();
+
+        if(followFloor){
+            goalAltitude=target.position.y; // pega posição Y inicial do player
+        }
     }
+
+    void OnEnable() {
+        Player.HasLanded+=UpdateCameraAltitude;
+    }
+
+    void OnDisable() {
+        Player.HasLanded+=UpdateCameraAltitude;
+    }
+
+    void UpdateCameraAltitude(){
+        if(!followFloor)
+            return;
+        // att posição Y da cam quando player pisar no chão
+        goalAltitude=target.position.y;
+    }
+
 
     private void FixedUpdate() 
     {
@@ -40,6 +63,12 @@ public class MarioCameraFollow : MonoBehaviour
     void Follow(){
 
         Vector3 targetPosition = target.position + offset;  // pega posição do player
+
+        // se followFloor true modifica o Y na cam
+        if(followFloor){
+            targetPosition.y = goalAltitude+offset.y;
+        }
+
 
         // definir minimo x,y,z e maximo x,y,z do movimento da cam
         Vector3 boundPosition = new Vector3(
@@ -65,12 +94,12 @@ public class MarioCameraFollow : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(MarioCameraFollow))]
-public class MarioCameraFollowEditor : Editor {
+[CustomEditor(typeof(DynamicCameraFollow))]
+public class DynamicCameraFollowEditor : Editor {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        var script = (MarioCameraFollow) target;     // indica qual script vai pegar os valores
+        var script = (DynamicCameraFollow) target;     // indica qual script vai pegar os valores
 
         GUILayout.Space(20);                // espaço de cima/baixo que separa o texto
 
@@ -125,12 +154,12 @@ public class MarioCameraFollowEditor : Editor {
 
         }else{
 
-            if(script.ss == MarioCameraFollow.SetupState.None){
+            if(script.ss == DynamicCameraFollow.SetupState.None){
                 if(GUILayout.Button("Start Settings Camera Values")){
 
-                    script.ss = MarioCameraFollow.SetupState.Step1;
+                    script.ss = DynamicCameraFollow.SetupState.Step1;
                 }
-            } else if(script.ss == MarioCameraFollow.SetupState.Step1){
+            } else if(script.ss == DynamicCameraFollow.SetupState.Step1){
                 // pega valor minimo da camera
                 GUILayout.Label($"1- Select your main Camera", defaultStyle);
                 GUILayout.Label($"2- Move it to the bottom left bound limit of your level", defaultStyle);
@@ -138,10 +167,10 @@ public class MarioCameraFollowEditor : Editor {
 
                 if(GUILayout.Button("Set Minimum Values")){
                     script.minValues = Camera.main.transform.position;
-                    script.ss = MarioCameraFollow.SetupState.Step2;  // indica proximo passo
+                    script.ss = DynamicCameraFollow.SetupState.Step2;  // indica proximo passo
                 }
 
-            } else if(script.ss == MarioCameraFollow.SetupState.Step2){
+            } else if(script.ss == DynamicCameraFollow.SetupState.Step2){
                 // pega valor maximo da camera
                 GUILayout.Label($"1- Select your main Camera", defaultStyle);
                 GUILayout.Label($"2- Move it to the top right bound limit of your level", defaultStyle);
@@ -149,7 +178,7 @@ public class MarioCameraFollowEditor : Editor {
 
                 if(GUILayout.Button("Set Maximum Values")){
                     script.maxValue = Camera.main.transform.position;
-                    script.ss = MarioCameraFollow.SetupState.None;   // indica proximo passo
+                    script.ss = DynamicCameraFollow.SetupState.None;   // indica proximo passo
                     script.setupComplete = true;
 
                     Vector3 targetPos = script.target.position  + script.offset;

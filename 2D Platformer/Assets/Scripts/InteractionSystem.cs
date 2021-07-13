@@ -22,6 +22,13 @@ public class InteractionSystem : MonoBehaviour
 
     public bool isExamining;
 
+    // GrabDrop ------------------------------------
+    [Header("GrabDrop")]
+    public bool isGrabbing;
+    public GameObject grabbedObject;
+    public float grabbedObjectYValue;
+    public Transform grabPoint;
+
 
     // lista de itens pegos
     // [Header("Lista")]
@@ -31,6 +38,13 @@ public class InteractionSystem : MonoBehaviour
     {
         if(DetectObject()){
             if(InteractInput()){
+                
+                // se tiver pegado algo, não deixa interagir com outro item
+                if(isGrabbing){
+                    GrabDrop(); // drop item para interagir com outro item
+                    return;
+                }
+
                 detectedObject.GetComponent<Item>().Interact();
             }
         }
@@ -47,6 +61,7 @@ public class InteractionSystem : MonoBehaviour
     }
 
     bool DetectObject(){
+
         Collider2D obj = Physics2D.OverlapCircle(detectionPoint.position, detectionRadius, detectionLayer);
 
         if(obj==null){
@@ -69,6 +84,24 @@ public class InteractionSystem : MonoBehaviour
             examineText.text = item.descriptionText;
             examineWindow.SetActive(true);  // mostra tela de info
             isExamining = true;             // não deixa player se mover
+        }
+    }
+
+    public void GrabDrop(){
+        if(isGrabbing){
+            isGrabbing = false;
+            grabbedObject.transform.parent = null;
+            // ao solta obj deixa no ultimo Y que estava quando era parent
+            grabbedObject.transform.position = new Vector3(
+                grabbedObject.transform.position.x, grabbedObjectYValue, grabbedObject.transform.position.z);
+            
+            grabbedObject = null;   // não tem item pego
+        } else {
+            isGrabbing = true;
+            grabbedObject = detectedObject; //
+            grabbedObject.transform.parent = transform;
+            grabbedObjectYValue = grabbedObject.transform.position.y;
+            grabbedObject.transform.localPosition = grabPoint.localPosition;
         }
     }
 
