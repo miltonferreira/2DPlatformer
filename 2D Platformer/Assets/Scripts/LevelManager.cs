@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
+    
+    public int cole_cherry = 0;
+
     Vector2 playerInitPosition;
 
     private void Awake() {
