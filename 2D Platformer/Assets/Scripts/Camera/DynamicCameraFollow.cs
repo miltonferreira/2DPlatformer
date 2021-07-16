@@ -55,9 +55,13 @@ public class DynamicCameraFollow : MonoBehaviour
     {
         var playerViewPortPos = Camera.main.WorldToViewportPoint(target.transform.position);
 
-        if(playerViewPortPos.x>moveCameraTriggerValue){
-            Follow();
-        }
+        // Buga por algum motivo
+        // if(playerViewPortPos.x>moveCameraTriggerValue){
+        //     Follow();
+        // }
+
+        Follow();
+        
     }
 
     void Follow(){
@@ -68,7 +72,6 @@ public class DynamicCameraFollow : MonoBehaviour
         if(followFloor){
             targetPosition.y = goalAltitude+offset.y;
         }
-
 
         // definir minimo x,y,z e maximo x,y,z do movimento da cam
         Vector3 boundPosition = new Vector3(

@@ -8,6 +8,7 @@ public class collectCherry : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision) {
         if(collision.tag == "Player"){
             FindObjectOfType<LevelManager>().cole_cherry++;
+            FindObjectOfType<LevelManager>().getCherry();
             gameObject.SetActive(false);
         }
     }

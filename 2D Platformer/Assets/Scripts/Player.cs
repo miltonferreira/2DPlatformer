@@ -51,6 +51,9 @@ public class Player : MonoBehaviour
     // HasLanded event -----------------------------------------
     public static event Action HasLanded;
 
+    // var quando cam troca target
+    public bool isNotMovePlayer;
+
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
     // public PhysicsMaterial2D ph;
@@ -110,15 +113,23 @@ public class Player : MonoBehaviour
         bool can = true;
 
         if(FindObjectOfType<InteractionSystem>().isExamining){
-            can = false;
+            can = playerMove(false);
         }
         if(FindObjectOfType<InventorySystem>().isOpen){
-            can = false;
+            can = playerMove(false);
+        }
+        if(isNotMovePlayer){    // quando cam troca target, não deixa player se mover
+            can = playerMove(false);
         }
         if(isDead){
-            can = false;
+            can = playerMove(false);
         }
 
+        return can;
+    }
+
+    bool playerMove(bool can){
+        horizontalValue = 0;    // player para de andar
         return can;
     }
 
