@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour
 {
     
-    public int cole_cherry = 0; // quantidade de cherry's coletadas pelo players
+    public int cole_cherry = 0;     // quantidade de cherry's coletadas pelo players
     [Header("HUD Cherry's")]
     public Image[] cherryImgs;
-    public bool isChoice;   // false=ruim true=bom
+    public bool isChoice;           // false=ruim true=bom
 
-    Vector2 playerInitPosition;
-
+    Vector2 playerInitPosition;     //  seta posição inicial do player
+    
     private void Awake() {
         playerInitPosition = FindObjectOfType<Player>().transform.position;
     }
@@ -37,4 +37,5 @@ public class LevelManager : MonoBehaviour
         }
 
     }
+
 }

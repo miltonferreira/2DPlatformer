@@ -8,7 +8,7 @@ public class Crank : MonoBehaviour
     SpriteRenderer spr;
     public Sprite spr_crank_down;
     public Transform gate;  //portão que libera caminho ao player
-    bool isActive;          // true faz gate descer e abrir caminho
+    public bool isActive;          // true faz gate descer e abrir caminho
 
     // gate ----------------------------------
     public Transform wayPoint;

@@ -9,7 +9,9 @@ public class Sign : MonoBehaviour
     public Text text;
     
     public string[] dialog;
-    // Start is called before the first frame update
+    
+    [Header("ultimo diag scene")]
+    public bool isFinalLevel;    // indica se é o aviso do final da fase
     
     private void OnTriggerEnter2D(Collider2D collison) {
         if(collison.tag == "Player"){
@@ -19,6 +21,10 @@ public class Sign : MonoBehaviour
             }else{
                 text.text = dialog[0].ToString();
             }
+        }
+
+        if(isFinalLevel){
+            FindObjectOfType<Player>().isNotMovePlayer = true;   // nao deixa player se mover
         }
     }
 

@@ -5,15 +5,18 @@ using UnityEngine;
 public class Boss1 : MonoBehaviour
 {
 
-    public GameObject punch;        // soco do Boss
+    public GameObject punch;                // soco do Boss
+    private bool isChangeDir = true;        // indica que pode trocar direção esquerda ou direita
+    
     Rigidbody2D rb;
 
-    public bool isRight = false;    // se está direita ou esquerda
-    public float xVal = 100;        // velocidade de movimento
+    public bool isRight = false;        // se está direita ou esquerda
+    public float xVal = 100;            // velocidade de movimento
 
     [Header("Detecta Player")]
-    public int hurt;               // verifica se player tocar no colisor de dano do boss
-    public GameObject polyCollisor; // obj de dano do Boss
+    public int hurt;                    // verifica se player tocar no colisor de dano do boss
+    private bool isHurt;                    // checa se está no estado de machucado
+    public GameObject polyCollisor;     // obj de dano do Boss
     private Animator anim;
 
     [Header("Posicao do Player")]
@@ -25,29 +28,40 @@ public class Boss1 : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
+    
     void Update()
     {
-        if(playerTrans.position.x < transform.position.x){
-            //Esquerda
-            isRight = false;
-            transform.localScale = new Vector3(-1, 1, 1);
-        }else{
-            // Direita
-            isRight = true;
-            transform.localScale = new Vector3(1, 1, 1);
-        }
+        LookAtDir();
 
     }
 
+    IEnumerator LoopAttack(){
+        yield return new WaitForSeconds(2f);
+        if(!isHurt) Up();   // se não tiver em estado de machucado pode atacar
+    }
+
+    public void LookAtDir(){
+
+        if(isChangeDir && hurt>0)
+            if(playerTrans.position.x < transform.position.x){
+                //Esquerda
+                isRight = false;
+                transform.localScale = new Vector3(-1, 1, 1);
+            }else{
+                // Direita
+                isRight = true;
+                transform.localScale = new Vector3(1, 1, 1);
+            }
+    }
+
+    // Boss ataca
     public void AttackActive(){
-        punch.SetActive(true);
+
+        FreezeRotation();               // freeze rotation
+
+        isChangeDir = false;            // indica que não pode trocar direção
+
+        punch.SetActive(true);          // ativa soco do boss
 
         if(isRight){
             Vector2 targetVelocity = new Vector2(xVal, rb.velocity.y);
@@ -58,20 +72,63 @@ public class Boss1 : MonoBehaviour
         }
     }
 
+    // finaliza ataque
     public void AttackDisable(){
-        punch.SetActive(false);
+        Freeze();                           // freeze X e rotation
+        punch.SetActive(false);             // desativa soco do boss
+        isChangeDir = true;                 // indica que pode trocar direção
+        xVal = (xVal==5) ? 15:15;
+        polyCollisor.SetActive(true);       // ativa colisor de dano
+        StartCoroutine(LoopAttack());       // repete o ciclo de ataque
     }
 
+    // quando player pisa no boss, esse metodo é chamado
     public void Hurt(){
-        hurt --;;
-        anim.SetBool("Hurt", true);     // chama animação de dano
-        Invoke("Combat", 1);            //
+
+        hurt --;
+        Over();                             // se hurt <= 0 Boss derrubado
+
+        Freeze();                           // freeze X e rotation
+
+        isChangeDir = false;                // indica que não pode trocar direção
+        isHurt = true;                      // indica que machucou
+        punch.SetActive(false);             // desativa soco do boss
+        
+        anim.SetBool("Hurt", true);         // chama animação de dano
+
+        Invoke("HurtIsOver", 1);            
     }
 
-    public void Combat(){
-        anim.SetBool("Hurt", false);     // chama animação de dano
-        anim.SetTrigger("Attack");      // chama animação de dano
-        polyCollisor.SetActive(true);
+    // quando boss levantar ele vai pode checar em que direção está o player
+    // entra no loop de ataque
+    public void Up(){
+        isChangeDir = true;                 // indica que pode trocar direção
+        anim.SetTrigger("Attack");          // chama animação de ataque
     }
 
+    public void HurtIsOver(){
+        anim.SetBool("Hurt", false);        // chama animação de dano
+        isHurt = false;                     // indica que terminou machucou
+    }
+
+    // Boss derrubado, não vai para outras animações
+    private void Over(){
+        if(hurt <=0){
+            anim.SetTrigger("Over");
+            FindObjectOfType<finalLevel>().openGate.isActive = true;           // ativa portão
+        }
+    }
+
+    // constraints X, e rotation do palyer ----------------------------------------------------------------------
+    public void NoneFreeze(){
+        rb.constraints = RigidbodyConstraints2D.None;
+    }
+
+    public void Freeze(){
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+    }
+
+    public void FreezeRotation(){
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
 }

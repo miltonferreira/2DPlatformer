@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class TrapObject : MonoBehaviour
 {
+    // script usado no obj de soco do boss
     //public int damage = 25;
     private void Reset() {
         GetComponent<BoxCollider2D>().isTrigger = true;
