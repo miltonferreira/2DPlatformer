@@ -54,6 +54,9 @@ public class Player : MonoBehaviour
     // var quando cam troca target
     public bool isNotMovePlayer;
 
+    // Dano -----------------------------------------
+    public bool isHurt;     // indica que player tomou dano
+
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
     // public PhysicsMaterial2D ph;
@@ -82,9 +85,8 @@ public class Player : MonoBehaviour
         }
 
         // faz player pular ----------------------------------------
-        if(Input.GetButtonDown("Jump")){
+        if(Input.GetButtonDown("Jump") && !isHurt){
             Jump(); 
-            // animator.SetBool("Jump", jump);
         } 
 
         // faz player gacha ----------------------------------------
@@ -105,7 +107,6 @@ public class Player : MonoBehaviour
     void FixedUpdate(){
         GroundCheck();      // checa se player está no chão
         Move(horizontalValue, crouchPressed);
-        //CollisionRamp();    // 
     }
 
     // verifica se pode se mover ou nao
@@ -143,8 +144,6 @@ public class Player : MonoBehaviour
             if(!wasGrounded){
                 availableJumps = totalJumps;    // se tiver no chão pode pulo extra
                 multipleJump = false;           // se não tiver no chão, não dá pulo duplo
-
-                AudioManager.instance.PlaySFX("landing");
 
                 // trigger the HasLanded event
                 HasLanded?.Invoke();    // ? indica que pode invocar ou não
@@ -184,6 +183,7 @@ public class Player : MonoBehaviour
             multipleJump = true;                    // permite pular + que 1 vez
             availableJumps--;                       // subtrai 1 pulo
             rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
+            AudioManager.instance.PlaySFX("jump");
 
         } else {
 
@@ -222,7 +222,7 @@ public class Player : MonoBehaviour
             rb.velocity = v;
             isSliding = true;
 
-            if(Input.GetButtonDown("Jump")){
+            if(Input.GetButtonDown("Jump") && !isHurt){
                 availableJumps--;                       // subtrai 1 pulo
                 rb.velocity = Vector2.up * jumpPower;   // adiciona velocidade ao rb
             }
@@ -253,7 +253,9 @@ public class Player : MonoBehaviour
 
         // se gacha desativa colisor padrão
         standingCollider.enabled = !crouchFlag;     // quando gacha desativa collider grande
-        crouchingCollider.enabled = crouchFlag;     // quando gacha desativa collider pequeno
+        if(!isDead){
+            crouchingCollider.enabled = crouchFlag;     // quando gacha desativa collider pequeno
+        }
         #endregion
 
         #region Move & Run
@@ -267,8 +269,10 @@ public class Player : MonoBehaviour
             xVal *= crouchSpeedModifier;   // acelera o player
         }
 
-        Vector2 targetVelocity = new Vector2(xVal, rb.velocity.y);
-        rb.velocity = targetVelocity;
+        if(!isHurt){    // se não tomou dano pode mover player
+            Vector2 targetVelocity = new Vector2(xVal, rb.velocity.y);
+            rb.velocity = targetVelocity;
+        }
 
         // se o player estiver olhando para a esquerda
         if(facingRight && dir<0){
@@ -294,9 +298,13 @@ public class Player : MonoBehaviour
         Gizmos.DrawSphere(overHeadCheckCollider.position, overHeadCheckRadius);
     }
 
+
+    public void HurtOver(){
+        isHurt = false; // indica que saiu do dano
+    }
+
     public void Die(){
         isDead = true;
-        FindObjectOfType<LevelManager>().Restart();
     }
 
     public void ResetPlayer(){

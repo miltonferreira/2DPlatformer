@@ -77,7 +77,7 @@ public class EnemyIA : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision) {
         if(collision.tag == "Player"){
             //Debug.Log($"{name} collision with the player");
-            FindObjectOfType<LifeCount>().LoseLife();
+            FindObjectOfType<LifeCount>().LoseLife(this.gameObject.transform.position.x);
         }
     }
 }

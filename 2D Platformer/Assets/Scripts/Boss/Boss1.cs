@@ -22,6 +22,12 @@ public class Boss1 : MonoBehaviour
     [Header("Posicao do Player")]
     public Transform playerTrans;
 
+    // dialogo quando Player derrota boss
+    [Header("Diag derrotado")]
+    public Sign sign;
+
+    [Header("Troca foco Cam")]
+    public CameraSolo camSolo;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -60,6 +66,8 @@ public class Boss1 : MonoBehaviour
         FreezeRotation();               // freeze rotation
 
         isChangeDir = false;            // indica que não pode trocar direção
+
+        AudioManager.instance.PlaySFX("boss");
 
         punch.SetActive(true);          // ativa soco do boss
 
@@ -115,8 +123,19 @@ public class Boss1 : MonoBehaviour
     private void Over(){
         if(hurt <=0){
             anim.SetTrigger("Over");
-            FindObjectOfType<finalLevel>().openGate.isActive = true;           // ativa portão
+
+            FindObjectOfType<finalLevel>().openGate.isActive = true;        // ativa portão
+            AudioManager.instance.PlaySFX("gate");
+            
+            sign.DialogOverBoss();                                          // chama dialogo do boss derrotado
+            FindObjectOfType<Player>().isNotMovePlayer = true;          // nao deixa player se mover
+            StartCoroutine(CameraSolo());
         }
+    }
+
+    IEnumerator CameraSolo(){
+        yield return new WaitForSeconds(3f);
+        camSolo.changeFocus();                                          // troca foco da camera     
     }
 
     // constraints X, e rotation do palyer ----------------------------------------------------------------------

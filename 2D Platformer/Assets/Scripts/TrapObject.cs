@@ -11,9 +11,9 @@ public class TrapObject : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision) {
         if(collision.tag == "Player"){
-            Debug.Log($"{name} collision with the player");
+            // Debug.Log($"{name} collision with the player");
             //FindObjectOfType<HealthBar>().LoseHealth(damage);
-            FindObjectOfType<LifeCount>().LoseLife();
+            FindObjectOfType<LifeCount>().LoseLife(this.gameObject.transform.position.x);
         }
     }
 }

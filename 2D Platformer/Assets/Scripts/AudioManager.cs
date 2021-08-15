@@ -8,9 +8,9 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance;
     
     // Sound FX
-    public AudioClip sfx_landing, sfx_cherry;
+    public AudioClip sfx_jump, sfx_hurt, sfx_cherry, sfx_end, sfx_boss, sfx_hurt_boss, sfx_gate;
     // Music
-    public AudioClip music_tiktok, music_bobo;
+    public AudioClip music_tiktok;
     // Current Music Object
     public GameObject currentMusicObj;
     // Sound Object
@@ -23,11 +23,26 @@ public class AudioManager : MonoBehaviour
     public void PlaySFX(string sfxName){
 
         switch(sfxName){
-            case "landing":
-                SoundObjectCreate(sfx_landing);
+            case "jump":
+                SoundObjectCreate(sfx_jump);
                 break;
             case "cherry":
                 SoundObjectCreate(sfx_cherry);
+                break;
+            case "end":
+                SoundObjectCreate(sfx_end);
+                break;
+            case "boss":
+                SoundObjectCreate(sfx_boss);
+                break;
+            case "hurt":
+                SoundObjectCreate(sfx_hurt);
+                break;
+            case "hurt_boss":
+                SoundObjectCreate(sfx_hurt_boss);
+                break;
+            case "gate":
+                SoundObjectCreate(sfx_gate);
                 break;
             default:
                 break;
@@ -51,7 +66,7 @@ public class AudioManager : MonoBehaviour
                 MusicObjectCreate(music_tiktok);
                 break;
             case "bobo":
-                MusicObjectCreate(music_bobo);
+                MusicObjectCreate(sfx_hurt);
                 break;
             default:
                 break;
