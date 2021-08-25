@@ -57,6 +57,11 @@ public class Player : MonoBehaviour
     // Dano -----------------------------------------
     public bool isHurt;     // indica que player tomou dano
 
+    // joystick mobile ---------------------------------
+    [Header("joystick mobile")]
+    public FixedJoystick fixedJoystick;
+    public bool isMobile;
+
     // ramp ----------------------------------------------------
     // [Header("Ramp")]
     // public PhysicsMaterial2D ph;
@@ -74,8 +79,21 @@ public class Player : MonoBehaviour
         if(!CanMoveOrInteract())
             return;
         
-        horizontalValue = Input.GetAxisRaw("Horizontal");
+        if(!isMobile){
+            horizontalValue = Input.GetAxisRaw("Horizontal");
+        }else{
+            fixedJoystick.SnapX = true;
+            horizontalValue = fixedJoystick.Horizontal;
 
+            // faz raposa gacha no mobile
+            fixedJoystick.SnapY = true;
+            if(fixedJoystick.Vertical == -1){
+                crouchPressed = true;
+            }else{
+                crouchPressed = false;
+            }
+        }
+        
         // faz player correr ----------------------------------------
         if(Input.GetKeyDown(KeyCode.LeftShift)){
             isRunning = true;
@@ -90,10 +108,12 @@ public class Player : MonoBehaviour
         } 
 
         // faz player gacha ----------------------------------------
-        if(Input.GetButtonDown("Crouch")){
-            crouchPressed = true;
-        } else if(Input.GetButtonUp("Crouch")){
-            crouchPressed = false;
+        if(!isMobile){
+            if(Input.GetButtonDown("Crouch")){
+                crouchPressed = true;
+            } else if(Input.GetButtonUp("Crouch")){
+                crouchPressed = false;
+            }
         }
 
         // set yVelocity do animator do player
@@ -176,7 +196,7 @@ public class Player : MonoBehaviour
         coyoteJump = false;
     }
 
-    void Jump(){
+    public void Jump(){
 
         if(isGrounded){ // faz player pular
             //rb.AddForce(new Vector2(0f, jumpPower)); //adiciona força ao rb
